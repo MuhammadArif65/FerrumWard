@@ -1,3 +1,4 @@
+#![allow(dead_code, unused_variables, unused_imports)]
 use crate::error::{Result, RustShieldError};
 
 /// Checks if the process is running inside a virtual machine.

@@ -1,3 +1,4 @@
+#![allow(dead_code, unused_variables, unused_imports)]
 use crate::error::{Result, RustShieldError};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};

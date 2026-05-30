@@ -1,3 +1,4 @@
+#![allow(dead_code, unused_variables, unused_imports)]
 use crate::error::{Result, RustShieldError};
 
 #[cfg(target_os = "linux")]
