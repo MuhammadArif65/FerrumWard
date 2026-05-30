@@ -1,3 +1,4 @@
+#![allow(warnings)]
 use rustshield_core::error::RustShieldError;
 use rustshield_core::protection::{protect, ProtectionConfig};
 use rustshield_core::rustshield_checkpoint;
@@ -96,7 +97,10 @@ pub extern "C" fn rustshield_init(config: *const CProtectionConfig) -> i32 {
         }
     }));
 
-    match result { Ok(code) => code, Err(_) => -1 }
+    match result {
+        Ok(code) => code,
+        Err(_) => -1,
+    }
 }
 
 /// Triggers a random manual checkpoint from C/C++.
@@ -108,7 +112,10 @@ pub extern "C" fn rustshield_run_checkpoint() -> i32 {
         Err(_) => 0,
     }));
 
-    match result { Ok(code) => code, Err(_) => -1 }
+    match result {
+        Ok(code) => code,
+        Err(_) => -1,
+    }
 }
 
 #[no_mangle]

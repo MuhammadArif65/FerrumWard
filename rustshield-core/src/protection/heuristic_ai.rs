@@ -1,8 +1,9 @@
+#![allow(clippy::new_without_default)]
 use crate::error::{Result, RustShieldError};
-use std::time::Instant;
-use std::sync::{Mutex, OnceLock};
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 use core::arch::x86_64::_rdtsc;
+use std::sync::{Mutex, OnceLock};
+use std::time::Instant;
 
 pub static GLOBAL_AI: OnceLock<Mutex<NeuralHeuristicEngine>> = OnceLock::new();
 
@@ -15,7 +16,7 @@ pub struct NeuralHeuristicEngine {
     hidden_biases: [f32; 4],
     output_weights: [f32; 4],
     output_bias: f32,
-    
+
     last_check: Instant,
     last_page_faults: u64,
 }
@@ -52,10 +53,16 @@ impl NeuralHeuristicEngine {
             let end = _rdtsc();
             let delta = end.saturating_sub(start);
             // Normal execution takes ~20-100 cycles. A hypervisor VM-exit can take 1000+ cycles.
-            if delta > 1000 { 1.0 } else { (delta as f32) / 1000.0 }
+            if delta > 1000 {
+                1.0
+            } else {
+                (delta as f32) / 1000.0
+            }
         }
         #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
-        { 0.0 }
+        {
+            0.0
+        }
     }
 
     /// Estimates page faults by reading /proc/self/stat on Linux.
@@ -71,9 +78,13 @@ impl NeuralHeuristicEngine {
                             let total = minflt + majflt;
                             let delta = total.saturating_sub(self.last_page_faults);
                             self.last_page_faults = total;
-                            
+
                             // If delta > 1000 in a short time, it's very suspicious
-                            return if delta > 1000 { 1.0 } else { (delta as f32) / 1000.0 };
+                            return if delta > 1000 {
+                                1.0
+                            } else {
+                                (delta as f32) / 1000.0
+                            };
                         }
                     }
                 }
@@ -87,7 +98,11 @@ impl NeuralHeuristicEngine {
         let elapsed = self.last_check.elapsed().as_millis() as f32;
         // If the check loop took significantly longer than expected (e.g. paused in debugger)
         // Note: The caller should call this roughly every 50-300ms.
-        if elapsed > 1000.0 { 1.0 } else { elapsed / 1000.0 }
+        if elapsed > 1000.0 {
+            1.0
+        } else {
+            elapsed / 1000.0
+        }
     }
 
     /// Measures Memory Entropy of the code segment to detect injected shellcode
@@ -105,7 +120,7 @@ impl NeuralHeuristicEngine {
                 byte_counts[val as usize] += 1;
             }
         }
-        
+
         let mut entropy = 0.0_f32;
         for &count in byte_counts.iter() {
             if count > 0 {

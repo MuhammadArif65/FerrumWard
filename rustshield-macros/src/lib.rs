@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, ItemFn};
 use rand::Rng;
+use syn::{parse_macro_input, ItemFn};
 
 /// A macro to obfuscate the control flow of a function by injecting opaque predicates.
 #[proc_macro_attribute]
@@ -14,16 +14,16 @@ pub fn obfuscate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let fn_attrs = &input_fn.attrs;
 
     let mut rng = rand::thread_rng();
-    
+
     // Generate a random opaque predicate:
     // We know that for any integer x, x * x + x is always even, so (x*x+x) % 2 == 0 is ALWAYS true.
     let random_var_name = format!("_opaque_{}", rng.gen::<u32>());
     let random_var = syn::Ident::new(&random_var_name, proc_macro2::Span::call_site());
-    
+
     // We create an opaque predicate condition
     // let `random_var` = rand() % 1000;
     // if (`random_var` * `random_var` + `random_var`) % 2 == 0 { ... } else { panic!("Cheat detected") }
-    
+
     let obfuscated_block = quote! {
         {
             let #random_var: u64 = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_secs() % 100;

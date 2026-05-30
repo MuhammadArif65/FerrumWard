@@ -27,8 +27,11 @@ impl KinematicAnomalyDetector {
     /// Feeds a new click interval (in milliseconds) to the AI detector.
     /// Returns TamperDetected if the variance is inhumanly perfect.
     pub fn feed_click_interval(&self, delta_ms: u64) -> Result<()> {
-        let mut intervals = self.click_intervals.lock().map_err(|_| RustShieldError::TamperDetected)?;
-        
+        let mut intervals = self
+            .click_intervals
+            .lock()
+            .map_err(|_| RustShieldError::TamperDetected)?;
+
         if intervals.len() >= self.max_samples {
             intervals.remove(0);
         }

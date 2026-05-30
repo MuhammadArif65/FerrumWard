@@ -31,12 +31,12 @@ fn compute_text_section_hash() -> Result<String> {
     // To remain zero-dependency and minimal, we hash the first 16 bytes
     // of some critical functions in our own library.
     // If a cheat tries to place a JMP (hook) here, the hash will change.
-    
+
     let fn_ptr1 = crate::protection::protect as *const u8;
     let fn_ptr2 = verify_memory_integrity as *const u8;
 
     let mut hasher = Sha256::new();
-    
+
     // SAFETY: [Rule 2 Exception] Reading function pointers to compute memory checksums.
     // We only read 16 bytes from a known valid code section.
     #[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]

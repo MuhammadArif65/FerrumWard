@@ -1,8 +1,8 @@
-use anyhow::{Context, Result};
 use aes_gcm::{
     aead::{Aead, KeyInit, OsRng},
     Aes256Gcm, Key, Nonce,
 };
+use anyhow::{Context, Result};
 use rand::RngCore;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -37,7 +37,7 @@ pub fn pack_binary(input: &Path, output: &Path) -> Result<()> {
         .parent()
         .unwrap()
         .join("rustshield-loader");
-        
+
     let src_dir = loader_dir.join("src");
     fs::create_dir_all(&src_dir).context("Failed to create loader src directory")?;
 
@@ -59,14 +59,18 @@ pub fn pack_binary(input: &Path, output: &Path) -> Result<()> {
 
     // 7. Copy the compiled loader to the requested output path
     let workspace_dir = loader_dir.parent().unwrap();
-    let compiled_loader = workspace_dir.join("target").join("release").join("rustshield-loader");
-    
+    let compiled_loader = workspace_dir
+        .join("target")
+        .join("release")
+        .join("rustshield-loader");
+
     // On Windows, the output might have .exe
-    let compiled_loader = if !compiled_loader.exists() && compiled_loader.with_extension("exe").exists() {
-        compiled_loader.with_extension("exe")
-    } else {
-        compiled_loader
-    };
+    let compiled_loader =
+        if !compiled_loader.exists() && compiled_loader.with_extension("exe").exists() {
+            compiled_loader.with_extension("exe")
+        } else {
+            compiled_loader
+        };
 
     fs::copy(&compiled_loader, output).context("Failed to copy compiled loader to output path")?;
 

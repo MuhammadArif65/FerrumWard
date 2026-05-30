@@ -1,3 +1,4 @@
+#![allow(warnings)]
 use aes_gcm::{
     aead::{Aead, KeyInit},
     Aes256Gcm, Key, Nonce,
@@ -12,15 +13,15 @@ static ENCRYPTION_KEY: &[u8] = include_bytes!("key.bin");
 fn main() {
     let key = Key::<Aes256Gcm>::from_slice(ENCRYPTION_KEY);
     let cipher = Aes256Gcm::new(key);
-    
+
     // Nonce is prepended to the payload (first 12 bytes)
     if ENCRYPTED_PAYLOAD.len() < 12 {
         panic!("Invalid payload");
     }
-    
+
     let (nonce_bytes, ciphertext) = ENCRYPTED_PAYLOAD.split_at(12);
     let nonce = Nonce::from_slice(nonce_bytes);
-    
+
     let decrypted = match cipher.decrypt(nonce, ciphertext) {
         Ok(data) => data,
         Err(_) => panic!("Corrupted payload"),
@@ -31,31 +32,34 @@ fn main() {
 
 #[cfg(target_os = "linux")]
 fn execute_payload(payload: &[u8]) {
-    use memfd::{MemfdOptions, FileSeal};
-    use std::os::unix::process::CommandExt;
+    use memfd::{FileSeal, MemfdOptions};
     use std::io::Write;
     use std::os::fd::AsRawFd;
+    use std::os::unix::process::CommandExt;
 
     let opts = MemfdOptions::default().allow_sealing(true);
-    let mfd = opts.create("rustshield_game").expect("Failed to create memfd");
-    
+    let mfd = opts
+        .create("rustshield_game")
+        .expect("Failed to create memfd");
+
     let mut file = mfd.as_file();
     file.write_all(payload).expect("Failed to write to memfd");
-    
+
     // Add seals to prevent further modification
     mfd.add_seals(&[
         FileSeal::SealShrink,
         FileSeal::SealGrow,
         FileSeal::SealWrite,
         FileSeal::SealSeal,
-    ]).unwrap();
+    ])
+    .unwrap();
 
     let args: Vec<String> = env::args().skip(1).collect();
 
     // Execute the file from memory
     let mut cmd = Command::new(format!("/proc/self/fd/{}", mfd.as_file().as_raw_fd()));
     cmd.args(&args);
-    
+
     // exec replaces the current process
     let err = cmd.exec();
     panic!("Failed to execute game payload: {}", err);
@@ -73,8 +77,10 @@ fn execute_payload(payload: &[u8]) {
         .tempfile()
         .expect("Failed to create temporary file");
 
-    temp_file.write_all(payload).expect("Failed to write payload");
-    
+    temp_file
+        .write_all(payload)
+        .expect("Failed to write payload");
+
     let path = temp_file.path().to_owned();
 
     // Ensure it is executable on macOS
@@ -87,7 +93,7 @@ fn execute_payload(payload: &[u8]) {
     }
 
     let args: Vec<String> = env::args().skip(1).collect();
-    
+
     // Execute the temp file and wait for it to finish
     let mut child = Command::new(&path)
         .args(&args)
@@ -95,6 +101,6 @@ fn execute_payload(payload: &[u8]) {
         .expect("Failed to start game process");
 
     let _ = child.wait();
-    
+
     // Temp file will be deleted automatically when `temp_file` goes out of scope
 }

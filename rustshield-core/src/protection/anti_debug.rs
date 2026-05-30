@@ -62,7 +62,8 @@ fn check_windows() -> bool {
     use std::ffi::CString;
 
     type IsDebuggerPresentFn = unsafe extern "system" fn() -> i32;
-    type CheckRemoteDebuggerPresentFn = unsafe extern "system" fn(*mut std::ffi::c_void, *mut i32) -> i32;
+    type CheckRemoteDebuggerPresentFn =
+        unsafe extern "system" fn(*mut std::ffi::c_void, *mut i32) -> i32;
     type GetCurrentProcessFn = unsafe extern "system" fn() -> *mut std::ffi::c_void;
 
     extern "system" {
@@ -74,7 +75,7 @@ fn check_windows() -> bool {
     }
 
     let mut attached = false;
-    
+
     let kernel32_str = match CString::new(crate::rs_str!("kernel32.dll")) {
         Ok(s) if !s.as_bytes().is_empty() => s,
         _ => return false,
@@ -123,7 +124,7 @@ fn check_windows() -> bool {
             }
         }
     }
-    
+
     attached
 }
 
@@ -160,7 +161,7 @@ fn check_macos() -> bool {
     };
     // RTLD_DEFAULT on macOS is (void *)-2
     let handle = -2isize as *mut std::ffi::c_void;
-    
+
     let sysctl_ptr = unsafe {
         // SAFETY: Calling dlsym with RTLD_DEFAULT is safe.
         dlsym(handle, sysctl_str.as_ptr())
@@ -169,7 +170,7 @@ fn check_macos() -> bool {
     if sysctl_ptr.is_null() {
         return false;
     }
-    
+
     let sysctl_func: SysctlFn = unsafe {
         // SAFETY: Transmuting dlsym result to known function pointer type.
         std::mem::transmute(sysctl_ptr)

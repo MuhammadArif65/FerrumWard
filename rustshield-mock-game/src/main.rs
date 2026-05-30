@@ -1,20 +1,30 @@
+#![allow(warnings)]
 use bevy::prelude::*;
 use rustshield_bevy::RustShieldPlugin;
-use rustshield_core::protection::ProtectionConfig;
-use rustshield_core::license::validate_license_secure;
 use rustshield_core::fingerprint::verify_manifest;
+use rustshield_core::license::validate_license_secure;
+use rustshield_core::protection::ProtectionConfig;
 
 fn main() {
     println!("Starting RustShield Mock Game...");
     println!("LSPCI IS: {:?}", rustshield_core::rs_str!("lspci"));
-    println!("UNKNOWN_MAC IS: {:?}", rustshield_core::rs_str!("unknown_mac"));
-    println!("RAW HWID: {:?}", rustshield_core::fingerprint::get_hwid_profile());
+    println!(
+        "UNKNOWN_MAC IS: {:?}",
+        rustshield_core::rs_str!("unknown_mac")
+    );
+    println!(
+        "RAW HWID: {:?}",
+        rustshield_core::fingerprint::get_hwid_profile()
+    );
 
     // NOTE: In production, use proper error handling instead of expect/unwrap.
     let public_key = match std::fs::read("public.key") {
         Ok(key) => key,
         Err(e) => {
-            eprintln!("💀 [MOCK GAME] Failed to read public.key: {}. Shutting down.", e);
+            eprintln!(
+                "💀 [MOCK GAME] Failed to read public.key: {}. Shutting down.",
+                e
+            );
             std::process::exit(1);
         }
     };
@@ -50,7 +60,10 @@ fn main() {
     if let Some(ref lic) = config.license {
         match validate_license_secure(lic.trim(), &verifying_key, &config.game_id) {
             Err(e) => {
-                eprintln!("💀 [MOCK GAME] Invalid License. Error: {:?}. Shutting down.", e);
+                eprintln!(
+                    "💀 [MOCK GAME] Invalid License. Error: {:?}. Shutting down.",
+                    e
+                );
                 std::process::exit(1);
             }
             Ok(_) => {}
@@ -62,7 +75,8 @@ fn main() {
 
     if let Some(ref manifest) = config.manifest_path {
         if let Ok(current_dir) = std::env::current_dir() {
-            let report = verify_manifest(&current_dir.join("rustshield-mock-game/assets"), manifest);
+            let report =
+                verify_manifest(&current_dir.join("rustshield-mock-game/assets"), manifest);
             if report.is_err() || !report.as_ref().map_or(false, |r| r.is_clean()) {
                 eprintln!("💀 [MOCK GAME] File Integrity Compromised. Shutting down.");
                 std::process::exit(1);
@@ -71,7 +85,11 @@ fn main() {
     }
 
     App::new()
-        .add_plugins(MinimalPlugins.set(bevy::app::ScheduleRunnerPlugin::run_loop(std::time::Duration::from_secs_f64(1.0 / 60.0))))
+        .add_plugins(
+            MinimalPlugins.set(bevy::app::ScheduleRunnerPlugin::run_loop(
+                std::time::Duration::from_secs_f64(1.0 / 60.0),
+            )),
+        )
         .add_plugins(RustShieldPlugin::new(config))
         .add_systems(Update, game_loop_system)
         .run();

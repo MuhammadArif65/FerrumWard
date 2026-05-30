@@ -68,7 +68,9 @@ pub fn verify_manifest(game_dir: &Path, manifest_path: &Path) -> Result<Integrit
             Err(e) => {
                 if let Some(path) = e.path() {
                     if let Ok(relative) = path.strip_prefix(game_dir) {
-                        report.missing.push(relative.to_string_lossy().replace("\\", "/"));
+                        report
+                            .missing
+                            .push(relative.to_string_lossy().replace("\\", "/"));
                     }
                 }
                 continue;

@@ -22,7 +22,7 @@ pub fn assert_no_injected_modules() -> Result<()> {
 
 fn contains_bad_module(module_name: &str) -> bool {
     let lower = module_name.to_lowercase();
-    
+
     let blacklist = [
         crate::rs_str!("cheatengine"),
         crate::rs_str!("speedhack"),
@@ -45,7 +45,10 @@ fn check_linux() -> Result<()> {
     use std::io::{BufRead, BufReader};
 
     if let Ok(file) = File::open(crate::rs_str!("/proc/self/maps")) {
-        for line in BufReader::new(file).lines().map_while(std::result::Result::ok) {
+        for line in BufReader::new(file)
+            .lines()
+            .map_while(std::result::Result::ok)
+        {
             if contains_bad_module(&line) {
                 return Err(RustShieldError::TamperDetected);
             }
@@ -56,10 +59,10 @@ fn check_linux() -> Result<()> {
 
 #[cfg(target_os = "windows")]
 fn check_windows() -> Result<()> {
-    // Note: To remain zero-dependency (without heavy winapi crates), 
+    // Note: To remain zero-dependency (without heavy winapi crates),
     // we query the loaded modules via tasklist if available.
     use std::process::Command;
-    
+
     let pid = std::process::id();
     if let Ok(output) = Command::new(crate::rs_str!("tasklist"))
         .args([
@@ -82,7 +85,7 @@ fn check_windows() -> Result<()> {
 fn check_macos() -> Result<()> {
     // macOS has vmmap, but it's slow. We'll use vmmap for the current PID.
     use std::process::Command;
-    
+
     let pid = std::process::id();
     if let Ok(output) = Command::new(crate::rs_str!("vmmap"))
         .arg(pid.to_string())

@@ -69,7 +69,10 @@ impl HwidProfile {
 
 pub fn get_hwid_profile() -> Result<HwidProfile> {
     // 1. Get Machine UUID
-    println!("IS OBFUSCATION ON? {}", cfg!(feature = "string-obfuscation"));
+    println!(
+        "IS OBFUSCATION ON? {}",
+        cfg!(feature = "string-obfuscation")
+    );
     let machine = machine_uid::get().unwrap_or_else(|_| crate::rs_str!("unknown_machine"));
 
     // 2. CPU and RAM
@@ -128,14 +131,20 @@ fn get_gpu_id() -> Option<String> {
         .args([
             crate::rs_str!("-NoProfile"),
             crate::rs_str!("-Command"),
-            crate::rs_str!("Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name"),
+            crate::rs_str!(
+                "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name"
+            ),
         ])
         .output()
         .ok()?;
-    if !output.status.success() { return None; }
+    if !output.status.success() {
+        return None;
+    }
     let out_str = String::from_utf8_lossy(&output.stdout);
     let trimmed = out_str.trim();
-    if trimmed.is_empty() { return None; }
+    if trimmed.is_empty() {
+        return None;
+    }
     Some(trimmed.to_string())
 }
 
@@ -145,14 +154,20 @@ fn get_bios_uuid() -> Option<String> {
         .args([
             crate::rs_str!("-NoProfile"),
             crate::rs_str!("-Command"),
-            crate::rs_str!("Get-CimInstance Win32_ComputerSystemProduct | Select-Object -ExpandProperty UUID"),
+            crate::rs_str!(
+                "Get-CimInstance Win32_ComputerSystemProduct | Select-Object -ExpandProperty UUID"
+            ),
         ])
         .output()
         .ok()?;
-    if !output.status.success() { return None; }
+    if !output.status.success() {
+        return None;
+    }
     let out_str = String::from_utf8_lossy(&output.stdout);
     let trimmed = out_str.trim();
-    if trimmed.is_empty() { return None; }
+    if trimmed.is_empty() {
+        return None;
+    }
     Some(trimmed.to_string())
 }
 
@@ -161,10 +176,14 @@ fn get_mac_address() -> Option<String> {
     let output = Command::new(crate::rs_str!("powershell"))
         .args([crate::rs_str!("-NoProfile"), crate::rs_str!("-Command"), crate::rs_str!("Get-CimInstance Win32_NetworkAdapterConfiguration | Where-Object { $_.IPEnabled -eq $true } | Select-Object -ExpandProperty MACAddress | Select-Object -First 1")])
         .output().ok()?;
-    if !output.status.success() { return None; }
+    if !output.status.success() {
+        return None;
+    }
     let out_str = String::from_utf8_lossy(&output.stdout);
     let trimmed = out_str.trim();
-    if trimmed.is_empty() { return None; }
+    if trimmed.is_empty() {
+        return None;
+    }
     Some(trimmed.to_string())
 }
 
@@ -173,10 +192,14 @@ fn get_disk_serial() -> Option<String> {
     let output = Command::new(crate::rs_str!("powershell"))
         .args([crate::rs_str!("-NoProfile"), crate::rs_str!("-Command"), crate::rs_str!("Get-CimInstance Win32_DiskDrive | Select-Object -ExpandProperty SerialNumber | Select-Object -First 1")])
         .output().ok()?;
-    if !output.status.success() { return None; }
+    if !output.status.success() {
+        return None;
+    }
     let out_str = String::from_utf8_lossy(&output.stdout);
     let trimmed = out_str.trim();
-    if trimmed.is_empty() { return None; }
+    if trimmed.is_empty() {
+        return None;
+    }
     Some(trimmed.to_string())
 }
 
@@ -190,7 +213,11 @@ fn get_gpu_id() -> Option<String> {
     out_str
         .lines()
         .find(|l| l.contains(&crate::rs_str!("Chipset Model:")))
-        .map(|s| s.replace(&crate::rs_str!("Chipset Model:"), "").trim().to_string())
+        .map(|s| {
+            s.replace(&crate::rs_str!("Chipset Model:"), "")
+                .trim()
+                .to_string()
+        })
 }
 
 #[cfg(target_os = "macos")]
@@ -203,12 +230,19 @@ fn get_bios_uuid() -> Option<String> {
     out_str
         .lines()
         .find(|l| l.contains(&crate::rs_str!("Hardware UUID:")))
-        .map(|s| s.replace(&crate::rs_str!("Hardware UUID:"), "").trim().to_string())
+        .map(|s| {
+            s.replace(&crate::rs_str!("Hardware UUID:"), "")
+                .trim()
+                .to_string()
+        })
 }
 
 #[cfg(target_os = "macos")]
 fn get_mac_address() -> Option<String> {
-    let output = Command::new(crate::rs_str!("ifconfig")).arg(crate::rs_str!("-a")).output().ok()?;
+    let output = Command::new(crate::rs_str!("ifconfig"))
+        .arg(crate::rs_str!("-a"))
+        .output()
+        .ok()?;
     let out_str = String::from_utf8_lossy(&output.stdout);
     out_str
         .lines()
@@ -226,12 +260,20 @@ fn get_disk_serial() -> Option<String> {
     out_str
         .lines()
         .find(|l| l.contains(&crate::rs_str!("Volume UUID:")))
-        .map(|s| s.replace(&crate::rs_str!("Volume UUID:"), "").trim().to_string())
+        .map(|s| {
+            s.replace(&crate::rs_str!("Volume UUID:"), "")
+                .trim()
+                .to_string()
+        })
         .or_else(|| {
             out_str
                 .lines()
                 .find(|l| l.contains(&crate::rs_str!("Device Identifier:")))
-                .map(|s| s.replace(&crate::rs_str!("Device Identifier:"), "").trim().to_string())
+                .map(|s| {
+                    s.replace(&crate::rs_str!("Device Identifier:"), "")
+                        .trim()
+                        .to_string()
+                })
         })
 }
 
@@ -241,7 +283,10 @@ fn get_gpu_id() -> Option<String> {
     let out_str = String::from_utf8_lossy(&output.stdout);
     let res = out_str
         .lines()
-        .find(|l| l.to_lowercase().contains(&crate::rs_str!("vga")) || l.to_lowercase().contains(&crate::rs_str!("3d")))
+        .find(|l| {
+            l.to_lowercase().contains(&crate::rs_str!("vga"))
+                || l.to_lowercase().contains(&crate::rs_str!("3d"))
+        })
         .map(|s| s.trim().to_string());
     println!("GET_GPU_ID: {:?}", res);
     res
@@ -269,7 +314,10 @@ fn get_mac_address() -> Option<String> {
     let dirs = std::fs::read_dir(crate::rs_str!("/sys/class/net")).ok()?;
     for entry in dirs.flatten() {
         if let Ok(name) = entry.file_name().into_string() {
-            if name != crate::rs_str!("lo") && !name.starts_with(crate::rs_str!("docker").as_str()) && !name.starts_with(crate::rs_str!("veth").as_str()) {
+            if name != crate::rs_str!("lo")
+                && !name.starts_with(crate::rs_str!("docker").as_str())
+                && !name.starts_with(crate::rs_str!("veth").as_str())
+            {
                 let mac_path = entry.path().join(crate::rs_str!("address"));
                 if let Ok(mac) = std::fs::read_to_string(mac_path) {
                     let trimmed = mac.trim();

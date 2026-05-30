@@ -18,12 +18,13 @@ pub fn encrypt_secure_asset(data: &[u8], encryption_key: &[u8]) -> Result<Vec<u8
 
     let key = aes_gcm::Key::<Aes256Gcm>::from_slice(encryption_key);
     let cipher = Aes256Gcm::new(key);
-    
+
     let mut nonce_bytes = [0u8; 12];
     rand::thread_rng().fill(&mut nonce_bytes);
     let nonce = Nonce::from_slice(&nonce_bytes); // 96-bits
 
-    let mut ciphertext = cipher.encrypt(nonce, data)
+    let mut ciphertext = cipher
+        .encrypt(nonce, data)
         .map_err(|_| RustShieldError::TamperDetected)?;
 
     // Prepend nonce to ciphertext
@@ -47,7 +48,8 @@ pub fn decrypt_secure_asset(encrypted_data: &[u8], encryption_key: &[u8]) -> Res
     let nonce = Nonce::from_slice(&encrypted_data[0..12]);
     let ciphertext = &encrypted_data[12..];
 
-    let plaintext = cipher.decrypt(nonce, ciphertext)
+    let plaintext = cipher
+        .decrypt(nonce, ciphertext)
         .map_err(|_| RustShieldError::TamperDetected)?;
 
     Ok(plaintext)

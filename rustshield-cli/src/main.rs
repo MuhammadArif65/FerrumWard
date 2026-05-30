@@ -145,11 +145,13 @@ fn main() -> Result<()> {
             public_key,
         } => {
             let (signing_key, verifying_key) = generate_keypair();
-            
-            let mut priv_file = File::create(&private_key).context("Failed to create private key file")?;
+
+            let mut priv_file =
+                File::create(&private_key).context("Failed to create private key file")?;
             priv_file.write_all(signing_key.as_bytes())?;
 
-            let mut pub_file = File::create(&public_key).context("Failed to create public key file")?;
+            let mut pub_file =
+                File::create(&public_key).context("Failed to create public key file")?;
             pub_file.write_all(verifying_key.as_bytes())?;
 
             println!("✅ Keypair generated successfully!");
@@ -166,10 +168,11 @@ fn main() -> Result<()> {
             output,
         } => {
             let priv_bytes = std::fs::read(private_key).context("Failed to read private key")?;
-            
-            let key_bytes: [u8; 32] = priv_bytes.as_slice().try_into()
-                .map_err(|_| anyhow::anyhow!("Private key must be exactly 32 bytes (file rusak atau path salah)"))?;
-            
+
+            let key_bytes: [u8; 32] = priv_bytes.as_slice().try_into().map_err(|_| {
+                anyhow::anyhow!("Private key must be exactly 32 bytes (file rusak atau path salah)")
+            })?;
+
             let signing_key = SigningKey::from_bytes(&key_bytes);
 
             let expires = if expires_at == 0 {
@@ -201,11 +204,18 @@ fn main() -> Result<()> {
         Commands::Manifest { dir, output } => {
             let mut manifest = HashMap::new();
 
-            for entry in walkdir::WalkDir::new(&dir).into_iter().filter_map(|e| e.ok()) {
+            for entry in walkdir::WalkDir::new(&dir)
+                .into_iter()
+                .filter_map(|e| e.ok())
+            {
                 let path = entry.path();
                 if path.is_file() {
                     let hash = hash_file(path)?;
-                    let relative_path = path.strip_prefix(&dir).unwrap().to_string_lossy().into_owned();
+                    let relative_path = path
+                        .strip_prefix(&dir)
+                        .unwrap()
+                        .to_string_lossy()
+                        .into_owned();
                     manifest.insert(relative_path, hash);
                 }
             }
@@ -223,10 +233,13 @@ fn main() -> Result<()> {
                 license_file,
                 public_key,
             } => {
-                let license_str = std::fs::read_to_string(license_file).context("Failed to read license file")?;
+                let license_str =
+                    std::fs::read_to_string(license_file).context("Failed to read license file")?;
                 let pub_bytes = std::fs::read(public_key).context("Failed to read public key")?;
-                
-                let key_bytes: [u8; 32] = pub_bytes.as_slice().try_into()
+
+                let key_bytes: [u8; 32] = pub_bytes
+                    .as_slice()
+                    .try_into()
                     .map_err(|_| anyhow::anyhow!("Public key must be exactly 32 bytes"))?;
                 let verifying_key = VerifyingKey::from_bytes(&key_bytes)
                     .map_err(|_| anyhow::anyhow!("Invalid public key"))?;
@@ -258,16 +271,16 @@ fn main() -> Result<()> {
                 anyhow::bail!("Public key must be exactly 32 bytes");
             }
             let key = rustshield_core::crypto::derive_asset_key(&machine, &pub_bytes);
-            
+
             let plaintext = std::fs::read(&input).context("Failed to read input file")?;
             let encrypted = rustshield_core::crypto::encrypt_asset(&plaintext, &key)
                 .map_err(|e| anyhow::anyhow!("Encryption failed: {:?}", e))?;
-                
+
             let mut out_file = File::create(&output).context("Failed to create output file")?;
             out_file.write_all(&encrypted)?;
-            
+
             println!("✅ Asset encrypted successfully to {}", output.display());
-        },
+        }
 
         Commands::Pack { input, output } => {
             packer::pack_binary(&input, &output)?;

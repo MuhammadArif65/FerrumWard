@@ -59,7 +59,7 @@ pub fn check_time_tampering() -> Result<()> {
                 }
                 d
             }
-        },
+        }
         Err(e) => {
             // System time is before base_system_time. The drift is the time
             // that should have elapsed (monotonic) plus how far back it went.

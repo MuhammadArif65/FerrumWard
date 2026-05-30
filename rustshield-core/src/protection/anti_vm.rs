@@ -162,7 +162,7 @@ fn check_macos() -> bool {
     if sysctl_ptr.is_null() {
         return false;
     }
-    
+
     // SAFETY: We verified sysctl_ptr is not null. It points to the sysctlbyname function.
     let sysctl_func: SysctlBynameFn = unsafe { std::mem::transmute(sysctl_ptr) };
 
@@ -175,7 +175,8 @@ fn check_macos() -> bool {
             &mut size,
             ptr::null_mut(),
             0,
-        ) != 0 {
+        ) != 0
+        {
             return false;
         }
 
@@ -186,7 +187,8 @@ fn check_macos() -> bool {
             &mut size,
             ptr::null_mut(),
             0,
-        ) == 0 {
+        ) == 0
+        {
             // Null terminated, but String::from_utf8 handles the slice. We can trim nulls later or just check contains.
             if let Ok(text) = String::from_utf8(info) {
                 let clean_text = text.trim_matches(char::from(0));

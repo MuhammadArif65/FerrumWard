@@ -9,12 +9,12 @@ pub fn assert_valid_parent_process() -> Result<()> {
     sys.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
 
     let current_pid = sysinfo::get_current_pid().map_err(|_| RustShieldError::TamperDetected)?;
-    
+
     if let Some(process) = sys.process(current_pid) {
         if let Some(parent_pid) = process.parent() {
             if let Some(parent_process) = sys.process(parent_pid) {
                 let parent_name = parent_process.name().to_string_lossy().to_lowercase();
-                
+
                 // Blacklist of known debuggers and suspicious launchers
                 let blacklist = [
                     crate::rs_str!("x64dbg"),

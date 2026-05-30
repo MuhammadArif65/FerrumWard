@@ -1,23 +1,23 @@
 use crate::error::{Result, RustShieldError};
-use rand::Rng;
 #[cfg(feature = "hardware-binding")]
 use crate::fingerprint::get_hardware_id;
 #[cfg(feature = "anti-debug")]
 use crate::protection::anti_debug::assert_no_debugger;
+use crate::protection::anti_dump::erase_headers_from_memory;
+use crate::protection::anti_inject::assert_no_injected_modules;
+use crate::protection::anti_suspend::start_anti_suspend_watchdog;
 #[cfg(feature = "anti-vm")]
 use crate::protection::anti_vm::assert_no_virtual_machine;
 #[cfg(feature = "canary")]
 use crate::protection::canary::CanaryGuard;
-use crate::protection::self_check::{init_self_check, verify_self_check};
-use crate::protection::time_guard::{check_time_tampering, init_time_guard};
-use crate::protection::anti_inject::assert_no_injected_modules;
+use crate::protection::chaotic_thread::start_chaotic_hive_mind;
+use crate::protection::decoy_honeypot::DecoyHoneypot;
+use crate::protection::hw_breakpoint::assert_no_hardware_breakpoints;
 use crate::protection::mem_integrity::{init_memory_integrity, verify_memory_integrity};
 use crate::protection::parent_process::assert_valid_parent_process;
-use crate::protection::anti_dump::erase_headers_from_memory;
-use crate::protection::anti_suspend::start_anti_suspend_watchdog;
-use crate::protection::hw_breakpoint::assert_no_hardware_breakpoints;
-use crate::protection::decoy_honeypot::DecoyHoneypot;
-use crate::protection::chaotic_thread::start_chaotic_hive_mind;
+use crate::protection::self_check::{init_self_check, verify_self_check};
+use crate::protection::time_guard::{check_time_tampering, init_time_guard};
+use rand::Rng;
 use std::sync::{Arc, OnceLock};
 use std::thread;
 use std::time::Duration;
@@ -107,11 +107,14 @@ pub fn protect(config: ProtectionConfig) -> Result<()> {
 
     // Start Anti-Suspend watchdog (e.g. 2000ms threshold)
     let config_clone = config_arc.clone();
-    let _watchdog_handle = start_anti_suspend_watchdog(2000, Some(Arc::new(Box::new(move |_err| {
-        if let Some(ref cb) = config_clone.on_failure {
-            cb(RustShieldError::TamperDetected);
-        }
-    }))));
+    let _watchdog_handle = start_anti_suspend_watchdog(
+        2000,
+        Some(Arc::new(Box::new(move |_err| {
+            if let Some(ref cb) = config_clone.on_failure {
+                cb(RustShieldError::TamperDetected);
+            }
+        }))),
+    );
 
     let state = ActiveProtectionState {
         config: config_arc.clone(),
@@ -140,7 +143,7 @@ pub fn protect(config: ProtectionConfig) -> Result<()> {
         }
         Ok(())
     }) as Box<dyn Fn() -> Result<()> + Send + Sync>);
-    
+
     let failure_cb = Arc::new(Box::new(move |_err: RustShieldError| {
         if let Some(ref cb) = config_clone2.on_failure {
             cb(RustShieldError::TamperDetected);
@@ -167,82 +170,84 @@ pub fn get_active_state() -> Option<&'static ActiveProtectionState> {
 /// Starts the background thread that periodically re-verifies integrity.
 fn start_protection_loop(config: Arc<ProtectionConfig>) {
     let config_thread = config.clone();
-    let builder_res = thread::Builder::new().name("rustshield_main".into()).spawn(move || {
-        loop {
-            // 3. Time tampering check
-            if check_time_tampering().is_err() {
-                if let Some(ref cb) = config_thread.on_failure {
-                    cb(RustShieldError::TamperDetected);
+    let builder_res = thread::Builder::new()
+        .name("rustshield_main".into())
+        .spawn(move || {
+            loop {
+                // 3. Time tampering check
+                if check_time_tampering().is_err() {
+                    if let Some(ref cb) = config_thread.on_failure {
+                        cb(RustShieldError::TamperDetected);
+                    }
+                    break;
                 }
-                break;
-            }
 
-            // 4. Process self-check
-            if verify_self_check().is_err() {
-                if let Some(ref cb) = config_thread.on_failure {
-                    cb(RustShieldError::TamperDetected);
+                // 4. Process self-check
+                if verify_self_check().is_err() {
+                    if let Some(ref cb) = config_thread.on_failure {
+                        cb(RustShieldError::TamperDetected);
+                    }
+                    break;
                 }
-                break;
-            }
 
-            if crate::protection::scan_for_rwx_memory().is_err() {
-                if let Some(ref cb) = config_thread.on_failure {
-                    cb(RustShieldError::TamperDetected);
+                if crate::protection::scan_for_rwx_memory().is_err() {
+                    if let Some(ref cb) = config_thread.on_failure {
+                        cb(RustShieldError::TamperDetected);
+                    }
+                    break;
                 }
-                break;
-            }
 
-            // 5. Memory integrity check
-            if verify_memory_integrity().is_err() {
-                if let Some(ref cb) = config_thread.on_failure {
-                    cb(RustShieldError::TamperDetected);
+                // 5. Memory integrity check
+                if verify_memory_integrity().is_err() {
+                    if let Some(ref cb) = config_thread.on_failure {
+                        cb(RustShieldError::TamperDetected);
+                    }
+                    break;
                 }
-                break;
-            }
 
-            // Sleep for a random interval between 10 and 60 seconds to prevent predictable timing attacks
-            let wait_secs = 10 + (rand::thread_rng().gen::<u64>() % 50);
-            thread::sleep(Duration::from_secs(wait_secs));
+                // Sleep for a random interval between 10 and 60 seconds to prevent predictable timing attacks
+                let wait_secs = 10 + (rand::thread_rng().gen::<u64>() % 50);
+                thread::sleep(Duration::from_secs(wait_secs));
 
-            let mut checks: Vec<fn() -> Result<()>> = Vec::new();
+                let mut checks: Vec<fn() -> Result<()>> = Vec::new();
 
-            #[cfg(feature = "hardware-binding")]
-            checks.push(verify_hwid_silent);
+                #[cfg(feature = "hardware-binding")]
+                checks.push(verify_hwid_silent);
 
-            #[cfg(feature = "canary")]
-            checks.push(verify_canaries_silent);
+                #[cfg(feature = "canary")]
+                checks.push(verify_canaries_silent);
 
-            #[cfg(feature = "anti-debug")]
-            if config_thread.anti_debug {
-                checks.push(assert_no_debugger);
-            }
+                #[cfg(feature = "anti-debug")]
+                if config_thread.anti_debug {
+                    checks.push(assert_no_debugger);
+                }
 
-            checks.push(assert_no_injected_modules);
-            checks.push(assert_valid_parent_process);
-            checks.push(assert_no_hardware_breakpoints);
-            checks.push(|| {
-                if let Some(s) = ACTIVE_STATE.get() {
-                    s.honeypot.verify()
+                checks.push(assert_no_injected_modules);
+                checks.push(assert_valid_parent_process);
+                checks.push(assert_no_hardware_breakpoints);
+                checks.push(|| {
+                    if let Some(s) = ACTIVE_STATE.get() {
+                        s.honeypot.verify()
+                    } else {
+                        Ok(())
+                    }
+                });
+
+                let result = if !checks.is_empty() {
+                    let check_id = rand::thread_rng().gen::<usize>() % checks.len();
+                    checks[check_id]()
                 } else {
                     Ok(())
-                }
-            });
+                };
 
-            let result = if !checks.is_empty() {
-                let check_id = rand::thread_rng().gen::<usize>() % checks.len();
-                checks[check_id]()
-            } else {
-                Ok(())
-            };
-
-            if result.is_err() {
-                if let Some(ref cb) = config_thread.on_failure {
-                    cb(RustShieldError::TamperDetected);
+                if result.is_err() {
+                    if let Some(ref cb) = config_thread.on_failure {
+                        cb(RustShieldError::TamperDetected);
+                    }
+                    break;
                 }
-                break;
             }
-        }
-    });
+        });
 
     if builder_res.is_err() {
         if let Some(ref cb) = config.on_failure {

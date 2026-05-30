@@ -23,7 +23,7 @@ fn check_windows() -> Result<()> {
     // Since Windows has x86 and x64, we'll align to x64 layout for simplicity,
     // assuming a 64-bit target, but to be robust we just check the return status.
     // To remain truly robust across archs without winapi, we use a large enough byte array.
-    
+
     #[repr(C, align(16))]
     struct ContextAlign16([u8; 1232]); // CONTEXT for x64 is 1232 bytes
 
@@ -41,7 +41,7 @@ fn check_windows() -> Result<()> {
     unsafe {
         let h_thread = GetCurrentThread();
         let mut ctx = ContextAlign16([0; 1232]);
-        
+
         // The ContextFlags is the first u32 in x86, but it's at offset 0x30 in x64.
         // We will just set the first 64 bytes to CONTEXT_DEBUG_REGISTERS, hoping it hits the flag.
         // A safer way is to use a properly defined struct, but for zero-deps this is tricky.

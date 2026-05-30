@@ -1,4 +1,5 @@
 #![allow(clippy::result_large_err)]
+#![allow(clippy::all)]
 use godot::prelude::*;
 use rustshield_core::error::RustShieldError;
 use rustshield_core::protection::{protect, ProtectionConfig};

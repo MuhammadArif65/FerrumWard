@@ -1,3 +1,4 @@
+#![allow(warnings)]
 use bevy::prelude::*;
 use rustshield_core::protection::{protect, ProtectionConfig};
 use rustshield_core::rustshield_checkpoint;

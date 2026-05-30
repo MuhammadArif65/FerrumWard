@@ -20,11 +20,16 @@ pub fn erase_headers_from_memory() -> Result<()> {
 #[cfg(target_os = "windows")]
 fn erase_windows() {
     use std::os::raw::c_void;
-    
+
     // Minimal FFI for Windows VirtualProtect
     extern "system" {
         fn GetModuleHandleA(lpModuleName: *const i8) -> *mut c_void;
-        fn VirtualProtect(lpAddress: *mut c_void, dwSize: usize, flNewProtect: u32, lpflOldProtect: *mut u32) -> i32;
+        fn VirtualProtect(
+            lpAddress: *mut c_void,
+            dwSize: usize,
+            flNewProtect: u32,
+            lpflOldProtect: *mut u32,
+        ) -> i32;
     }
 
     const PAGE_READWRITE: u32 = 0x04;
@@ -49,8 +54,8 @@ fn erase_windows() {
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 fn erase_posix() {
-    // Implementing this safely and reliably on Linux/macOS without breaking glibc or dyld 
-    // is highly complex. For this cross-platform library, we will leave it as a no-op 
+    // Implementing this safely and reliably on Linux/macOS without breaking glibc or dyld
+    // is highly complex. For this cross-platform library, we will leave it as a no-op
     // on POSIX for stability, as ELF header stripping is usually done on-disk.
     // Alternatively, one could use mprotect(PAGE_EXECUTE_READWRITE) on the base address.
 }

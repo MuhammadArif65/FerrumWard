@@ -27,12 +27,12 @@ impl Obfuscated32 {
     /// Reads the decrypted value and rotates the encryption key.
     pub fn get(&mut self) -> u32 {
         let value = self.data ^ self.key;
-        
+
         // Rotate key to prevent static memory scanning
         let new_key = rand::thread_rng().gen::<u32>();
         self.data = value ^ new_key;
         self.key = new_key;
-        
+
         value
     }
 

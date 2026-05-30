@@ -1,3 +1,4 @@
+use libc::{kill, ptrace, PTRACE_ATTACH, PTRACE_DETACH, SIGCONT, SIGSTOP};
 use std::env;
 use std::fs::OpenOptions;
 use std::io::{Read, Seek, SeekFrom, Write};
@@ -5,7 +6,6 @@ use std::process;
 use std::thread;
 use std::time::Duration;
 use sysinfo::System;
-use libc::{ptrace, PTRACE_ATTACH, PTRACE_DETACH, SIGSTOP, SIGCONT, kill};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -60,7 +60,7 @@ fn attack_ptrace(pid: i32) {
     }
     println!("[+] Attached successfully! Holding thread for 3 seconds...");
     thread::sleep(Duration::from_secs(3));
-    
+
     println!("[*] Detaching...");
     unsafe {
         ptrace(PTRACE_DETACH, pid, 0, 0);
@@ -71,7 +71,7 @@ fn attack_ptrace(pid: i32) {
 fn attack_scan(pid: i32) {
     println!("[*] Initiating Aggressive Memory Scan (Cheat Engine Simulator)...");
     let mem_path = format!("/proc/{}/mem", pid);
-    
+
     // We try to open /proc/pid/mem. This usually requires root or ptrace privileges depending on sysctl kernel.yama.ptrace_scope.
     // Assuming we have permissions (e.g. same user, ptrace_scope=0).
     match OpenOptions::new().read(true).open(&mem_path) {
@@ -79,7 +79,7 @@ fn attack_scan(pid: i32) {
             println!("[+] Opened {} for reading.", mem_path);
             let mut buffer = vec![0u8; 1024 * 1024 * 10]; // 10MB chunk
             let start_addr: u64 = 0x400000; // Typical Linux binary base
-            
+
             if f.seek(SeekFrom::Start(start_addr)).is_ok() {
                 println!("[*] Dumping 10MB from 0x{:x}...", start_addr);
                 match f.read_exact(&mut buffer) {
@@ -89,20 +89,23 @@ fn attack_scan(pid: i32) {
             } else {
                 eprintln!("[-] Seek failed.");
             }
-        },
-        Err(e) => eprintln!("[-] Failed to open memory: {}. (Tip: Need same user or ptrace rights)", e),
+        }
+        Err(e) => eprintln!(
+            "[-] Failed to open memory: {}. (Tip: Need same user or ptrace rights)",
+            e
+        ),
     }
 }
 
 fn attack_inject(pid: i32) {
     println!("[*] Initiating Memory Injection (DLL/Shellcode Injector Simulator)...");
     let mem_path = format!("/proc/{}/mem", pid);
-    
+
     match OpenOptions::new().write(true).open(&mem_path) {
         Ok(mut f) => {
             println!("[+] Opened {} for writing.", mem_path);
             let start_addr: u64 = 0x400000; // Risky arbitrary address
-            
+
             if f.seek(SeekFrom::Start(start_addr)).is_ok() {
                 println!("[*] Injecting malicious payload at 0x{:x}...", start_addr);
                 let payload = vec![0x90; 1024]; // 1KB NOP sled
@@ -111,7 +114,7 @@ fn attack_inject(pid: i32) {
                     Err(e) => eprintln!("[-] Injection failed (usually mapped read-only): {}", e),
                 }
             }
-        },
+        }
         Err(e) => eprintln!("[-] Failed to open memory for writing: {}", e),
     }
 }

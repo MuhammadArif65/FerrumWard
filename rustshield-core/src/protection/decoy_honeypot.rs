@@ -1,5 +1,5 @@
 use crate::error::{Result, RustShieldError};
-use std::sync::atomic::{AtomicI32, AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
 
 /// Highly attractive but completely fake variables to trap memory scanners like Cheat Engine.
 /// The game engine must NEVER modify these variables. If they change, we know a cheater

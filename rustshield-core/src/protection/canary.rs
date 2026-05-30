@@ -1,3 +1,4 @@
+#![allow(clippy::new_without_default)]
 use rand::Rng;
 use std::sync::atomic::{AtomicU64, Ordering};
 
