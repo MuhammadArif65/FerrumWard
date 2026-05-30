@@ -1,0 +1,14 @@
+[package]
+name = "rustshield-godot"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Godot 4 GDExtension for RustShield"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+rustshield-core = { path = "../rustshield-core", features = ["full"] }
+godot.workspace = true

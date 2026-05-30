@@ -1,0 +1,32 @@
+[workspace]
+resolver = "2"
+members = [
+    "rustshield-core",
+    "rustshield-cli",
+    "rustshield-ffi",
+    "rustshield-bevy",
+    "rustshield-godot",
+    "rustshield-mock-game",
+    "rustshield-macros",
+    "rustshield-loader",
+    "dummy_game",
+    "rustshield-attacker",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/rustshield/rustshield"
+authors = ["RustShield Contributors"]
+rust-version = "1.75"
+description = "Anti-piracy & game protection system"
+keywords = ["anti-piracy", "game-protection", "drm", "integrity", "security"]
+
+[workspace.dependencies]
+sysinfo = "0.39"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+serde_json = "1"
+walkdir = "2"
+bevy = { version = "0.18", default-features = false }
+godot = { version = "0.5", features = ["lazy-function-tables"] }

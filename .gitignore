@@ -1,0 +1,27 @@
+# Rust build artifacts
+/target
+**/target
+
+# Cargo lock for libraries (keep for workspace)
+# Cargo.lock is committed for reproducible builds
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sensitive files
+*.key
+*.pem
+*.bin
+*.license
+
+# Coverage
+tarpaulin-report.html
+lcov.info
