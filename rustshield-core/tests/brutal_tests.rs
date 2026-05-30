@@ -1,3 +1,4 @@
+#![allow(warnings)]
 use ed25519_dalek::{SigningKey, VerifyingKey};
 use rand::rngs::OsRng;
 use rustshield_core::{
