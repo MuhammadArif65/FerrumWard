@@ -1,55 +1,55 @@
-# 🛡️ RustShield: Panduan Utama Pengembang Game
+# 🛡️ RustShield: The Ultimate Game Developer Guide
 
-Selamat datang di **RustShield**! Panduan ini dirancang khusus untuk Anda (Pengembang Game) agar tidak kebingungan dalam mengamankan game Anda dari pembajakan dan *cheating*. 
+Welcome to **RustShield**! This guide is designed specifically for you (the Game Developer) to secure your game against piracy and cheating without the headache.
 
-Panduan ini disusun setahap demi setahap, mulai dari instalasi pertama kali, integrasi ke dalam mesin game (Godot, Bevy, Unity, Unreal), hingga proses mendistribusikan game ke tangan pemain Anda.
-
----
-
-## 📑 Daftar Isi
-1. [Apa itu RustShield?](#1-apa-itu-rustshield)
-2. [Langkah 1: Persiapan Awal (Kompilasi)](#2-langkah-1-persiapan-awal)
-3. [Langkah 2: Integrasi ke Game Engine](#3-langkah-2-integrasi-ke-game-engine)
-4. [Langkah 3: Proses Distribusi Game (Sangat Penting)](#4-langkah-3-proses-distribusi-game)
-5. [Langkah 4: Pengalaman Pemain (End-User)](#5-langkah-4-pengalaman-pemain)
-6. [Bukti Pengujian & Keamanan Terverifikasi](#6-bukti-pengujian--keamanan-terverifikasi)
+This guide is structured step-by-step, covering initial setup, game engine integration (Godot, Bevy, Unity, Unreal), all the way to distributing your game to your players.
 
 ---
 
-## 1. Apa itu RustShield?
-RustShield adalah sistem **DRM (Digital Rights Management) dan Anti-Cheat Offline** yang ditanam langsung ke dalam kode game Anda. RustShield beroperasi tanpa membutuhkan koneksi internet yang terus-menerus dan **tanpa akses kernel driver** (Ring 0), menjadikannya sangat aman dan ramah bagi sistem operasi Linux, Windows, maupun macOS.
-
-**Fitur Utama:**
-- Mendeteksi aplikasi *cheat* (Cheat Engine, debugger).
-- Mencegah game dimainkan di dalam Virtual Machine (Anti-VM).
-- Mengunci lisensi game secara spesifik hanya untuk satu komputer pemain (Hardware Binding / HWID).
+## 📑 Table of Contents
+1. [What is RustShield?](#1-what-is-rustshield)
+2. [Step 1: Initial Setup (Compilation)](#2-step-1-initial-setup-compilation)
+3. [Step 2: Game Engine Integration](#3-step-2-game-engine-integration)
+4. [Step 3: Game Distribution Process (Crucial)](#4-step-3-game-distribution-process)
+5. [Step 4: Player Experience (End-User flow)](#5-step-4-player-experience)
+6. [Test Evidence & Verified Security](#6-test-evidence--verified-security)
 
 ---
 
-## 2. Langkah 1: Persiapan Awal
+## 1. What is RustShield?
+RustShield is an **Offline DRM (Digital Rights Management) and Anti-Cheat system** embedded directly into your game's code. RustShield operates without requiring a continuous internet connection and **without kernel driver access** (Ring 0), making it extremely secure and friendly for Linux, Windows, and macOS operating systems.
 
-Sebelum memasang RustShield ke game Anda, Anda harus menyiapkan "Kunci Rahasia" (Secret Key) dan mengkompilasi *tool* pengembangan RustShield.
+**Key Features:**
+- Detects cheat applications (Cheat Engine, debuggers).
+- Prevents the game from being played inside a Virtual Machine (Anti-VM).
+- Locks the game license specifically to a single player's computer (Hardware Binding / HWID).
 
-**Syarat:** Komputer Anda harus terinstal **Rust (versi 1.75+)**.
+---
 
-1. Buka terminal (CMD/PowerShell/Bash) di folder proyek RustShield.
-2. Atur kunci enkripsi rahasia Anda. Ini digunakan untuk mengenkripsi teks di dalam program agar tidak bisa dibaca oleh *hacker*.
-   - **Windows (PowerShell):** `$env:LITCRYPT_ENCRYPT_KEY="KODE_RAHASIA_ANDA_BEBAS"`
-   - **Linux / macOS:** `export LITCRYPT_ENCRYPT_KEY="KODE_RAHASIA_ANDA_BEBAS"`
-3. Lakukan kompilasi seluruh alat RustShield dengan perintah berikut:
+## 2. Step 1: Initial Setup (Compilation)
+
+Before integrating RustShield into your game, you must set up your "Secret Key" and compile the RustShield development tools.
+
+**Prerequisite:** Your computer must have **Rust (version 1.75+)** installed.
+
+1. Open your terminal (CMD/PowerShell/Bash) in the RustShield project folder.
+2. Set your secret encryption key. This is used to encrypt sensitive text inside the program so hackers cannot read it.
+   - **Windows (PowerShell):** `$env:LITCRYPT_ENCRYPT_KEY="YOUR_SECRET_KEY_HERE"`
+   - **Linux / macOS:** `export LITCRYPT_ENCRYPT_KEY="YOUR_SECRET_KEY_HERE"`
+3. Compile all RustShield tools with the following command:
    ```bash
    cargo build --release --all --features full
    ```
-   *Tunggu hingga proses selesai. Semua alat akan tersedia di folder `target/release/`.*
+   *Wait until the process finishes. All tools will be available in the `target/release/` folder.*
 
 ---
 
-## 3. Langkah 2: Integrasi ke Game Engine
+## 3. Step 2: Game Engine Integration
 
-Sekarang Anda akan menanamkan RustShield ke dalam game buatan Anda. RustShield menyediakan cara mudah untuk berbagai jenis *Engine*.
+Now you will embed RustShield into your game. RustShield provides an easy approach for various engines.
 
-### 🎮 Untuk Pengguna Bevy Engine (Rust)
-Tambahkan `rustshield-bevy` ke dalam file `Cargo.toml` game Anda, lalu tambahkan *plugin* ini saat inisialisasi:
+### 🎮 For Bevy Engine (Rust)
+Add `rustshield-bevy` to your game's `Cargo.toml`, then add the plugin during initialization:
 
 ```rust
 use bevy::prelude::*;
@@ -58,91 +58,91 @@ use rustshield_core::protection::ProtectionConfig;
 
 fn main() {
     let config = ProtectionConfig {
-        game_id: "Nama_Game_Anda".to_string(),
+        game_id: "Your_Game_Name".to_string(),
         public_key: include_bytes!("../keys/public.key").to_vec(),
         license: Some(std::fs::read_to_string("player_license.sig").unwrap_or_default()),
         manifest_path: Some("manifest.json".into()),
         anti_debug: true,
         anti_vm: true,
         on_failure: Some(Box::new(|err| {
-            // Jika terdeteksi cheat atau lisensi salah, game otomatis keluar.
+            // If cheat is detected or license is invalid, exit automatically.
             std::process::exit(1);
         })),
     };
 
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(RustShieldPlugin::new(config)) // <--- RustShield ditambahkan di sini
+        .add_plugins(RustShieldPlugin::new(config)) // <--- RustShield added here
         .run();
 }
 ```
 
-### 🎮 Untuk Unity (C#) atau Unreal Engine (C++)
-Gunakan modul **`rustshield-ffi`**. Anda akan mendapatkan *file* `.dll` (Windows), `.so` (Linux), atau `.dylib` (macOS). Masukkan *file* ini ke folder plugin di Unity/Unreal Anda, lalu panggil fungsi inisialisasi (dokumentasi spesifik *engine* dapat dilihat di file `README.md` utama).
+### 🎮 For Unity (C#) or Unreal Engine (C++)
+Use the **`rustshield-ffi`** module. You will get a `.dll` (Windows), `.so` (Linux), or `.dylib` (macOS) file. Place this file into your Unity/Unreal plugin folder, then call the initialization function (specific engine documentation can be found in the main `README.md`).
 
 ---
 
-## 4. Langkah 3: Proses Distribusi Game
+## 4. Step 3: Game Distribution Process
 
-Bagian ini menjelaskan **bagaimana Anda menjual game Anda** menggunakan sistem Lisensi RustShield. Sistem lisensi ini memastikan bahwa pemain yang membeli game **tidak bisa membagikan (copy-paste)** gamenya ke temannya secara gratis.
+This section explains **how you sell your game** using the RustShield License system. This license system ensures that players who buy the game **cannot share (copy-paste)** the game to their friends for free.
 
-### Tahap 1: Generate Kunci Developer (Lakukan Sekali Saja)
-Sebagai developer pembuat game, jalankan alat CLI (Command Line Interface) RustShield untuk membuat sepasang kunci kriptografi:
+### Phase 1: Generate Developer Keys (Do this once)
+As the game developer, run the RustShield CLI (Command Line Interface) tool to generate a cryptographic keypair:
 ```bash
 cargo run --bin rustshield-cli -- keygen --output-dir ./keys
 ```
-Ini akan menghasilkan 2 file:
-- 🔴 **`private.key`**: **RAHASIA!** Simpan di komputer Anda atau server Anda. Jangan pernah dimasukkan ke dalam folder game. Ini dipakai untuk *membuat* lisensi.
-- 🟢 **`public.key`**: **AMAN.** File ini yang akan Anda tanam ke dalam kode game (seperti contoh kode Bevy di atas) untuk memvalidasi lisensi.
+This generates 2 files:
+- 🔴 **`private.key`**: **SECRET!** Keep this on your local computer or secure server. Never include this in the game folder. This is used to *create* licenses.
+- 🟢 **`public.key`**: **SAFE.** You will embed this file into your game's code (like the Bevy example above) to validate licenses.
 
-### Tahap 2: Kunci Aset Game (Membuat Manifest)
-Jika Anda memiliki file 3D, suara, atau aset (misal di folder `./assets`), Anda harus "menyegel" mereka agar pemain tidak bisa melakukan *modding* atau mencuri aset:
+### Phase 2: Lock Game Assets (Creating a Manifest)
+If you have 3D models, sounds, or assets (e.g., in the `./assets` folder), you must "seal" them so players cannot mod or steal your assets:
 ```bash
 cargo run --bin rustshield-cli -- manifest --target-dir ./assets --output manifest.json
 ```
-Sertakan file `manifest.json` ini ke dalam distribusi rilis game Anda.
+Include this `manifest.json` file in your game's release distribution.
 
-### Tahap 3: Merilis Game
-Kemasi folder game Anda (Executable, Assets, `manifest.json`, dan `public.key`). Unggah ke tempat Anda berjualan (Steam, Itch.io, web pribadi). Game sekarang siap di-download.
+### Phase 3: Releasing the Game
+Package your game folder (Executable, Assets, `manifest.json`, and `public.key`). Upload it to your storefront (Steam, Itch.io, personal website). Your game is now ready to download.
 
 ---
 
-## 5. Langkah 4: Pengalaman Pemain (Alur Validasi Lisensi)
+## 5. Step 4: Player Experience (License Validation Flow)
 
-Apa yang terjadi ketika ada pemain (budi) yang membeli game Anda?
+What happens when a player (John) buys your game?
 
-1. Budi men-download game Anda dan membukanya.
-2. Karena Budi belum memiliki file `player_license.sig`, game Anda akan memunculkan sebuah popup di layar Budi: *"Lisensi tidak ditemukan. HWID PC Anda adalah: MAC-B4D3-A09X"*
-3. Budi mengirimkan HWID tersebut ke website Anda (atau ke email Anda).
-4. Anda (Developer) **membuatkan lisensi khusus** untuk PC Budi menggunakan kunci rahasia Anda:
+1. John downloads your game and opens it.
+2. Since John doesn't have the `player_license.sig` file yet, your game will show a popup on his screen: *"License not found. Your PC HWID is: MAC-B4D3-A09X"*
+3. John sends that HWID to your website (or via email).
+4. You (the Developer) **generate a specific license** for John's PC using your secret private key:
    ```bash
-   cargo run --bin rustshield-cli -- license --hwid "MAC-B4D3-A09X" --private-key ./keys/private.key --game-id "Nama_Game_Anda" --output player_license.sig
+   cargo run --bin rustshield-cli -- license --hwid "MAC-B4D3-A09X" --private-key ./keys/private.key --game-id "Your_Game_Name" --output player_license.sig
    ```
-5. Anda memberikan file `player_license.sig` ke Budi.
-6. Budi menaruh file `player_license.sig` di sebelah game Anda.
-7. Saat Budi membuka game lagi, **GAME AKAN JALAN!**
+5. You send the `player_license.sig` file to John.
+6. John places the `player_license.sig` file next to your game executable.
+7. When John opens the game again, **THE GAME RUNS!**
 
-**Kenapa ini sangat aman?**
-Jika Budi menyalin folder game + lisensinya ke PC milik temannya (Andi), maka game akan membaca HWID PC Andi. Karena HWID Andi berbeda dari HWID Budi yang tercatat di dalam *lisensi*, **game akan mendeteksi pembajakan dan akan menutup otomatis.**
+**Why is this so secure?**
+If John copies his game folder + license to his friend's PC (Alex), the game will read Alex's PC HWID. Because Alex's HWID is different from John's HWID recorded inside the *license*, **the game will detect piracy and close automatically.**
 
 ---
 
-## 6. Bukti Pengujian & Keamanan Terverifikasi
+## 6. Test Evidence & Verified Security
 
-RustShield telah dirancang dengan standar kualitas tinggi dan telah **lolos uji kelayakan integrasi berkelanjutan (CI/CD)** pada semua platform sistem operasi utama dunia. 
+RustShield is designed with high-quality standards and has **passed Continuous Integration (CI/CD) validation tests** across all major operating systems.
 
-Berikut adalah bukti tes *(Automated Testing)* yang dilakukan secara otomatis oleh *runner* GitHub dan menjamin kestabilan:
+Below is the automated testing evidence performed by GitHub runners, guaranteeing stability:
 
-✅ **Pengujian Lintas Platform (100% SUCCESS):**
-- 🐧 **Ubuntu (Linux):** Kompilasi sukses, modul keamanan perangkat keras (TPM/`libtss2`) berintegrasi sempurna.
-- 🍏 **macOS:** Modul `ptrace` unix tervalidasi dengan sukses, keamanan terjamin tanpa menyebabkan sistem *crash*.
-- 🪟 **Windows:** Modul deteksi *debugger* API Windows dan multi-threading *Chaotic Engine* lolos tes `brutal_tests.rs` (terbukti stabil melawan kepanikan OS/panic 193).
+✅ **Cross-Platform Testing (100% SUCCESS):**
+- 🐧 **Ubuntu (Linux):** Compilation successful, hardware security module (TPM/`libtss2`) integrates perfectly.
+- 🍏 **macOS:** Unix `ptrace` module successfully validated, security guaranteed without causing system crashes.
+- 🪟 **Windows:** Windows API debugger detection and multi-threading *Chaotic Engine* passed `brutal_tests.rs` (proven stable against OS panic 193).
 
-✅ **Tes Integritas Kode (Lolos Tanpa Warning):**
-- Lolos `cargo fmt --all --check` (standar penulisan rapi).
-- Lolos `cargo clippy --all-targets -D warnings` (tidak ada memory-leak, tidak ada kode tidak aman di ruang pengguna).
-- `actions/checkout@v6` terbaru berjalan mulus di *runner* Node.js 24 standar baru GitHub Actions, membuktikan arsitektur *pipeline* modern.
+✅ **Code Integrity Tests (Passed Without Warnings):**
+- Passed `cargo fmt --all --check` (clean coding standards).
+- Passed `cargo clippy --all-targets -D warnings` (no memory leaks, no unsafe code in user-space).
+- Latest `actions/checkout@v6` runs smoothly on GitHub Actions' new standard Node.js 24 runners, proving a modern pipeline architecture.
 
-RustShield tidak hanya menakut-nakuti *cheater*, tetapi menjaga agar game Anda tetap ringan (zero-overhead), dan berjalan 100% stabil untuk *legitimate player* (pemain sah).
+RustShield doesn't just scare away cheaters; it keeps your game lightweight (zero-overhead) and runs 100% stable for legitimate players.
 
-Selamat merilis game dengan tenang! 🛡️🎮
+Happy releasing, with peace of mind! 🛡️🎮
