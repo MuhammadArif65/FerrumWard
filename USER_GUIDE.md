@@ -6,6 +6,12 @@ This guide is structured step-by-step, covering initial setup, game engine integ
 
 ---
 
+### 📚 Documentation Hub
+- 🏠 **[Main README](README.md)** - Overview and quick start.
+- 🧠 **[Architecture & Deep Dive](ARCHITECTURE.md)** - Learn how the underlying protection technology works.
+
+---
+
 ## 📑 Table of Contents
 1. [What is RustShield?](#1-what-is-rustshield)
 2. [Step 1: Initial Setup (Compilation)](#2-step-1-initial-setup-compilation)

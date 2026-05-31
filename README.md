@@ -4,7 +4,15 @@
 
 It provides out-of-the-box mechanisms to prevent debugging, virtualization, memory tampering, and unauthorized distribution through hardware-bound cryptography. RustShield is designed for offline games and ships with official wrappers for **Bevy**, **Godot**, **Unity**, and **Unreal Engine**.
 
-📖 **For a deep dive into how RustShield works, including the Neural Heuristic Engine, Decoy Honeypots, and Game Distribution flow, read the [Architecture Documentation](ARCHITECTURE.md).**
+---
+
+### 📚 Documentation Hub
+- 🚀 **[User Guide for Game Developers](USER_GUIDE.md)** - Start here! Step-by-step setup, integration, and distribution guide.
+- 🧠 **[Architecture & Deep Dive](ARCHITECTURE.md)** - Learn how the Neural Heuristic Engine and Chaotic Threading work under the hood.
+- 🤝 **[Contributing](CONTRIBUTING.md)** - How to contribute to the project.
+- 🛡️ **[Security Policy](SECURITY.md)** - Reporting vulnerabilities.
+
+---
 
 ## Features
 

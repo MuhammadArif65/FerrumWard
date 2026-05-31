@@ -2,6 +2,14 @@
 
 This document provides a deep dive into the inner workings of RustShield, from its underlying architecture to the complete lifecycle of game distribution.
 
+---
+
+### 📚 Documentation Hub
+- 🏠 **[Main README](README.md)** - Overview and quick start.
+- 🚀 **[User Guide for Game Developers](USER_GUIDE.md)** - Step-by-step setup, integration, and distribution guide.
+
+---
+
 ## 1. Project History & Philosophy
 
 RustShield was born out of the necessity for a **zero-dependency, highly secure offline DRM** (Digital Rights Management) system. Many existing anti-piracy solutions either rely heavily on "always-online" requirements, which frustrate legitimate players, or they operate as invasive kernel-level drivers (Ring 0), which introduce massive security vulnerabilities and compatibility issues (e.g., preventing games from running on Linux/Steam Deck via Proton).
