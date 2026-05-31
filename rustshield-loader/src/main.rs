@@ -104,3 +104,5 @@ fn execute_payload(payload: &[u8]) {
 
     // Temp file will be deleted automatically when `temp_file` goes out of scope
 }
+
+//

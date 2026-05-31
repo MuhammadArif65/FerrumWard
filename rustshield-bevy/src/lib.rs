@@ -46,3 +46,5 @@ fn rustshield_bevy_checkpoint_system() {
     // unless a random trigger condition is met, so it is safe to call per-frame.
     let _ = rustshield_checkpoint!();
 }
+
+//

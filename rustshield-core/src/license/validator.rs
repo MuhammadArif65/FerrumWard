@@ -102,3 +102,5 @@ pub fn validate_license_secure(
         Err(_) => Err(RustShieldError::TamperDetected),
     }
 }
+
+//

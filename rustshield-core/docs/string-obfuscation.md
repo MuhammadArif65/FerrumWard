@@ -47,3 +47,5 @@ fn print_secret() {
 1. **Memory Dump Risk**: While the string is obfuscated on disk, it exists in plaintext in memory after being decrypted. Advanced memory scanners might still find it.
 2. **Key Security**: The `LITCRYPT_ENCRYPT_KEY` must never be hardcoded in your CI/CD scripts in plain text; use GitHub Secrets or equivalent secure injection methods.
 3. **Performance Impact**: Decrypting strings at runtime incurs a tiny overhead. Avoid using obfuscated strings in extremely hot performance loops (like the inner render loop of your game engine).
+
+<!-- -->

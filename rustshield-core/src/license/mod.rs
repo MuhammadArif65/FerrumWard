@@ -23,3 +23,5 @@ pub struct LicenseData {
     /// Custom metadata provided by the developer
     pub metadata: HashMap<String, String>,
 }
+
+//

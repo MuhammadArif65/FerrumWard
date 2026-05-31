@@ -51,3 +51,5 @@ fn compute_text_section_hash() -> Result<String> {
     let result = hasher.finalize();
     Ok(format!("{:x}", result))
 }
+
+//

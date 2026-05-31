@@ -283,3 +283,5 @@ fn verify_canaries_silent() -> Result<()> {
     }
     Ok(())
 }
+
+//

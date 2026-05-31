@@ -32,3 +32,5 @@ pub fn scan_for_rwx_memory() -> Result<()> {
     // Stub for non-Linux OS. In Windows, we would use VirtualQuery to check for PAGE_EXECUTE_READWRITE.
     Ok(())
 }
+
+//

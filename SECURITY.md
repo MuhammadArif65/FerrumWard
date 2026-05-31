@@ -43,3 +43,5 @@ The following are in scope for security reports:
 - Social engineering
 - Denial of service against the protected application itself
 
+
+<!-- -->

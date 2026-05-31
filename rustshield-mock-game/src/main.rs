@@ -99,3 +99,5 @@ fn game_loop_system() {
     // This system simulates a game loop.
     // The rustshield_bevy_checkpoint_system is also running in the Update schedule.
 }
+
+//

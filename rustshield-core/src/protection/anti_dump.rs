@@ -59,3 +59,5 @@ fn erase_posix() {
     // on POSIX for stability, as ELF header stripping is usually done on-disk.
     // Alternatively, one could use mprotect(PAGE_EXECUTE_READWRITE) on the base address.
 }
+
+//

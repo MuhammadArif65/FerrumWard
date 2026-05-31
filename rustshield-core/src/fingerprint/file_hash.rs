@@ -119,3 +119,5 @@ pub fn verify_manifest(game_dir: &Path, manifest_path: &Path) -> Result<Integrit
 
     Ok(report)
 }
+
+//
