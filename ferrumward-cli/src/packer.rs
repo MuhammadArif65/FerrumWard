@@ -78,5 +78,3 @@ pub fn pack_binary(input: &Path, output: &Path) -> Result<()> {
 
     Ok(())
 }
-
-//

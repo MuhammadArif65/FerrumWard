@@ -2,25 +2,17 @@ use crate::error::{FerrumWardError, Result};
 use aes_gcm::aead::{Aead, KeyInit};
 use aes_gcm::{Aes256Gcm, Nonce};
 use rand::{rngs::OsRng, Rng};
-use sha2::{Digest, Sha256};
+use sha2::Sha256;
+
+use hkdf::Hkdf;
 
 /// Derives a 256-bit encryption key from the given machine ID and public key.
 pub fn derive_asset_key(machine_id: &str, public_key: &[u8]) -> [u8; 32] {
-    let mut hasher = Sha256::new();
-    hasher.update(machine_id.as_bytes());
-    hasher.update(public_key);
-
-    // Stretch a bit to slow down brute-force slightly (though PBKDF2 is better, this is lightweight)
-    let mut key = hasher.finalize();
-    for _ in 0..1000 {
-        let mut h = Sha256::new();
-        h.update(key);
-        key = h.finalize();
-    }
-
-    let mut result = [0u8; 32];
-    result.copy_from_slice(&key);
-    result
+    let hk = Hkdf::<Sha256>::new(Some(public_key), machine_id.as_bytes());
+    let mut okm = [0u8; 32];
+    hk.expand(b"ferrumward-asset-key", &mut okm)
+        .expect("32 is a valid length for Sha256");
+    okm
 }
 
 /// Encrypts an asset (plaintext bytes) using the derived key.
@@ -57,5 +49,3 @@ pub fn decrypt_asset(encrypted_data: &[u8], key: &[u8; 32]) -> Result<Vec<u8>> {
 
     Ok(plaintext)
 }
-
-//

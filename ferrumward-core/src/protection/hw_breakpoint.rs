@@ -85,5 +85,3 @@ fn check_windows() -> Result<()> {
 
     Ok(())
 }
-
-//

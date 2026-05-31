@@ -65,12 +65,9 @@ pub(crate) fn validate_license(
         serde_json::from_str(&expected_json).map_err(|_| FerrumWardError::HardwareMismatch)?;
 
     let score = expected_profile.match_score(&current_profile);
-    println!("EXPECTED HWID: {:?}", expected_profile);
-    println!("CURRENT HWID: {:?}", current_profile);
-    println!("SCORE: {}", score);
 
-    // Allow up to 3 components to change (must match at least 4 out of 7)
-    if score < 4 {
+    // Allow up to 3 components to change (must match at least 3 out of 6)
+    if score < 3 {
         return Err(FerrumWardError::HardwareMismatch);
     }
 
@@ -102,5 +99,3 @@ pub fn validate_license_secure(
         Err(_) => Err(FerrumWardError::TamperDetected),
     }
 }
-
-//

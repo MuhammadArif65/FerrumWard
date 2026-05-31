@@ -155,5 +155,3 @@ pub fn verify_manifest_signature(
 
     Ok(())
 }
-
-//

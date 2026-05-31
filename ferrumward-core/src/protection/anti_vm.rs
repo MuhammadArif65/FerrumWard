@@ -202,5 +202,3 @@ fn check_macos(allow_proton: bool) -> bool {
     }
     false
 }
-
-//

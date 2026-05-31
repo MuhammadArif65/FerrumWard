@@ -12,15 +12,6 @@ pub enum FerrumWardError {
     #[error("tampering detected")]
     TamperDetected,
 
-    /// Returned when a debugger is detected attached to the process.
-    #[error("debugger detected")]
-    DebuggerDetected,
-
-    /// Returned when the process is detected to be running inside a virtual machine
-    /// or emulator (excluding whitelisted environments like Wine/Proton).
-    #[error("virtual machine environment detected")]
-    VirtualMachineDetected,
-
     /// Returned when the cryptographic signature of the license is invalid.
     #[error("invalid license signature")]
     InvalidSignature,
@@ -72,5 +63,3 @@ pub enum FerrumWardError {
 
 /// A specialized `Result` type for FerrumWard operations.
 pub type Result<T> = std::result::Result<T, FerrumWardError>;
-
-//

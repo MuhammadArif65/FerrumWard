@@ -15,5 +15,3 @@ fn main() {
         file.write_all(&[0; 32]).unwrap(); // Dummy 32-byte key
     }
 }
-
-//

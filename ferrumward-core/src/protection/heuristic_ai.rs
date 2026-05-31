@@ -6,11 +6,11 @@ use core::arch::x86_64::_rdtsc;
 use std::sync::{Mutex, OnceLock};
 use std::time::Instant;
 
-pub static GLOBAL_AI: OnceLock<Mutex<NeuralHeuristicEngine>> = OnceLock::new();
+pub static GLOBAL_HEURISTIC: OnceLock<Mutex<WeightedHeuristicEngine>> = OnceLock::new();
 
-/// A lightweight Zero-Dependency Neural Heuristic Engine
+/// A lightweight Zero-Dependency Heuristic Engine
 /// Evaluates runtime system behavior to detect debuggers, hypervisors, and memory scanners.
-pub struct NeuralHeuristicEngine {
+pub struct WeightedHeuristicEngine {
     // Neural Network Weights (Pre-trained Offline)
     // 5 Inputs -> 4 Hidden Nodes -> 1 Output
     hidden_weights: [[f32; 5]; 4],
@@ -22,9 +22,9 @@ pub struct NeuralHeuristicEngine {
     last_page_faults: u64,
 }
 
-impl NeuralHeuristicEngine {
-    pub fn get_global() -> &'static Mutex<NeuralHeuristicEngine> {
-        GLOBAL_AI.get_or_init(|| Mutex::new(NeuralHeuristicEngine::new()))
+impl WeightedHeuristicEngine {
+    pub fn get_global() -> &'static Mutex<WeightedHeuristicEngine> {
+        GLOBAL_HEURISTIC.get_or_init(|| Mutex::new(WeightedHeuristicEngine::new()))
     }
 
     pub fn new() -> Self {
@@ -111,12 +111,12 @@ impl NeuralHeuristicEngine {
         // In a real scenario, we'd sample a random chunk of our own executable memory.
         // For zero-dependency, we simulate a fast pseudo-random sampling.
         let mut entropy_score = 0.0;
-        let ptr = NeuralHeuristicEngine::measure_time_drift as *const () as *const u8;
+        let ptr = WeightedHeuristicEngine::measure_time_drift as *const () as *const u8;
         let mut byte_counts = [0usize; 256];
         unsafe {
-            for i in 0..1024 {
+            for i in 0..64 {
                 // Safety: Reading our own .text segment is generally safe and mapped
-                // We use a small bounded read.
+                // We use a small bounded read to avoid crossing page boundaries.
                 let val = ptr.add(i).read_volatile();
                 byte_counts[val as usize] += 1;
             }
@@ -125,15 +125,16 @@ impl NeuralHeuristicEngine {
         let mut entropy = 0.0_f32;
         for &count in byte_counts.iter() {
             if count > 0 {
-                let p = (count as f32) / 1024.0;
+                let p = (count as f32) / 64.0;
                 entropy -= p * p.log2();
             }
         }
         // Max entropy for 256 bytes is 8.0. Normal code is around 4.0 - 6.0.
         // If it's near 8.0, it's heavily compressed or encrypted shellcode.
-        if entropy > 7.5 {
+        // For 64 bytes, max entropy is 6.0. We adjust the threshold.
+        if entropy > 5.5 {
             entropy_score = 1.0;
-        } else if entropy > 6.5 {
+        } else if entropy > 4.5 {
             entropy_score = 0.5;
         }
         entropy_score
@@ -189,5 +190,3 @@ impl NeuralHeuristicEngine {
         }
     }
 }
-
-//

@@ -99,5 +99,3 @@ fn check_macos() -> Result<()> {
     }
     Ok(())
 }
-
-//

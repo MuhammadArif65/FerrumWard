@@ -40,5 +40,3 @@ fn test_full_protection_lifecycle() {
     let checkpoint_result = verify_checkpoint();
     assert!(checkpoint_result.is_ok(), "Checkpoint failed");
 }
-
-//

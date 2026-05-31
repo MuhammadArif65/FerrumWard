@@ -42,5 +42,3 @@ pub fn assert_valid_parent_process() -> Result<()> {
 
     Ok(())
 }
-
-//

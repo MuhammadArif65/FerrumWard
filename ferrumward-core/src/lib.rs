@@ -30,5 +30,3 @@ pub mod license;
 pub mod protection;
 
 pub use error::{FerrumWardError, Result};
-
-//

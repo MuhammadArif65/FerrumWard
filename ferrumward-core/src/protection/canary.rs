@@ -61,5 +61,3 @@ impl CanaryGuard {
         true
     }
 }
-
-//

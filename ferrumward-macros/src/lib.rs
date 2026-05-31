@@ -48,5 +48,3 @@ pub fn obfuscate(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
     TokenStream::from(expanded)
 }
-
-//

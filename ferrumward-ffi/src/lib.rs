@@ -1,4 +1,3 @@
-#![allow(warnings)]
 use ferrumward_core::error::FerrumWardError;
 use ferrumward_core::ferrumward_checkpoint;
 use ferrumward_core::protection::{protect, ProtectionConfig};
@@ -99,10 +98,7 @@ pub extern "C" fn ferrumward_init(config: *const CProtectionConfig) -> i32 {
         }
     }));
 
-    match result {
-        Ok(code) => code,
-        Err(_) => -1,
-    }
+    result.unwrap_or(-1)
 }
 
 /// Triggers a random manual checkpoint from C/C++.
@@ -114,10 +110,7 @@ pub extern "C" fn ferrumward_run_checkpoint() -> i32 {
         Err(_) => 0,
     }));
 
-    match result {
-        Ok(code) => code,
-        Err(_) => -1,
-    }
+    result.unwrap_or(-1)
 }
 
 #[no_mangle]
@@ -148,5 +141,3 @@ pub extern "C" fn debug_mode_enable() {
         }
     }));
 }
-
-//

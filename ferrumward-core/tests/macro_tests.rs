@@ -17,5 +17,3 @@ fn test_obfuscation_macro() {
     // Expected: 10 * (5+10) + sum(0..9) = 150 + 45 = 195
     assert_eq!(result, 195);
 }
-
-//

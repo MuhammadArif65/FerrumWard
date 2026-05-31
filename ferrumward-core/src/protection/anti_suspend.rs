@@ -47,5 +47,3 @@ pub fn start_anti_suspend_watchdog(
 
     running
 }
-
-//

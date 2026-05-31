@@ -26,5 +26,3 @@ pub fn sign_license(license_data: &LicenseData, signing_key: &SigningKey) -> Res
 
     Ok(format!("{}.{}", payload_b64, sig_b64))
 }
-
-//

@@ -58,5 +58,3 @@ fn test_license_expiration() {
         ferrumward_core::error::FerrumWardError::TamperDetected
     ));
 }
-
-//

@@ -54,5 +54,3 @@ pub fn decrypt_secure_asset(encrypted_data: &[u8], encryption_key: &[u8]) -> Res
 
     Ok(plaintext)
 }
-
-//

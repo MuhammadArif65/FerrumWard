@@ -1,5 +1,3 @@
-#![allow(clippy::result_large_err)]
-#![allow(clippy::all)]
 use ferrumward_core::error::FerrumWardError;
 use ferrumward_core::ferrumward_checkpoint;
 use ferrumward_core::protection::{protect, ProtectionConfig};
@@ -112,7 +110,7 @@ impl FerrumWardGuard {
 
 // Helper to decode hex without relying on external crates or unwraps
 fn decode_hex(s: &str) -> Result<Vec<u8>, ()> {
-    if s.len() % 2 != 0 {
+    if !s.len().is_multiple_of(2) {
         return Err(());
     }
     let mut bytes = Vec::with_capacity(s.len() / 2);
@@ -124,5 +122,3 @@ fn decode_hex(s: &str) -> Result<Vec<u8>, ()> {
     }
     Ok(bytes)
 }
-
-//

@@ -55,5 +55,3 @@ impl Obfuscated32 {
         self.set(current.wrapping_sub(amount));
     }
 }
-
-//

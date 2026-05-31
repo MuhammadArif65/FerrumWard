@@ -1,4 +1,3 @@
-#![allow(warnings)]
 use bevy::prelude::*;
 use ferrumward_core::ferrumward_checkpoint;
 use ferrumward_core::protection::{protect, ProtectionConfig};
@@ -46,5 +45,3 @@ fn ferrumward_bevy_checkpoint_system() {
     // unless a random trigger condition is met, so it is safe to call per-frame.
     let _ = ferrumward_checkpoint!();
 }
-
-//

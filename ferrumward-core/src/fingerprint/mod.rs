@@ -8,5 +8,3 @@ pub mod hardware_id;
 pub use file_hash::{hash_file, verify_manifest, IntegrityReport};
 #[cfg(feature = "hardware-binding")]
 pub use hardware_id::{get_hardware_id, get_hwid_profile, HwidProfile};
-
-//

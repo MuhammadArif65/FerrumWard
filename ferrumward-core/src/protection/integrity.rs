@@ -36,6 +36,21 @@ pub struct ProtectionConfig {
     pub on_failure: Option<Box<dyn Fn(FerrumWardError) + Send + Sync>>,
 }
 
+impl Default for ProtectionConfig {
+    fn default() -> Self {
+        Self {
+            game_id: String::new(),
+            public_key: Vec::new(),
+            license: None,
+            manifest_path: None,
+            anti_debug: true,
+            anti_vm: true,
+            allow_proton: true,
+            on_failure: None,
+        }
+    }
+}
+
 /// Global state to support `ferrumward_checkpoint!` macros.
 pub struct ActiveProtectionState {
     pub config: Arc<ProtectionConfig>,
@@ -73,6 +88,20 @@ pub fn protect(config: ProtectionConfig) -> Result<()> {
     }
     if let Err(e) = assert_valid_parent_process() {
         trigger_failure(&config, e)?;
+    }
+
+    if let Some(ref manifest) = config.manifest_path {
+        let mut sig_path = manifest.clone();
+        sig_path.set_extension("sig");
+        if sig_path.exists() {
+            if let Err(e) = crate::fingerprint::file_hash::verify_manifest_signature(
+                manifest,
+                &sig_path,
+                &config.public_key,
+            ) {
+                return trigger_failure(&config, e);
+            }
+        }
     }
 
     // Initialize Canaries, Time Guard, and Self-Check
@@ -285,5 +314,3 @@ fn verify_canaries_silent() -> Result<()> {
     }
     Ok(())
 }
-
-//

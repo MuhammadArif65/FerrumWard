@@ -21,7 +21,7 @@ pub fn start_chaotic_hive_mind(
     let on_failure_thread = on_failure.clone();
     // Randomize thread name to prevent easy identification via htop/ps
     let thread_id: u32 = rand::thread_rng().gen();
-    let thread_name = format!("rs_{:08x}", thread_id);
+    let thread_name = format!("worker_{:08x}", thread_id);
     if thread::Builder::new()
         .name(thread_name)
         .spawn(move || {
@@ -39,7 +39,7 @@ pub fn start_chaotic_hive_mind(
             // If the AI is bypassed or deleted, this block will never execute,
             // which could be tied to an asset decryption seed in a real scenario.
             if let Ok(mut engine) =
-                crate::protection::heuristic_ai::NeuralHeuristicEngine::get_global().lock()
+                crate::protection::heuristic_ai::WeightedHeuristicEngine::get_global().lock()
             {
                 if engine.evaluate().is_err() {
                     on_failure_thread(FerrumWardError::TamperDetected);
@@ -57,5 +57,3 @@ pub fn start_chaotic_hive_mind(
         on_failure(FerrumWardError::TamperDetected);
     }
 }
-
-//

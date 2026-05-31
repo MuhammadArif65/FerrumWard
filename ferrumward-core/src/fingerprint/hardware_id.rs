@@ -22,7 +22,6 @@ impl HwidProfile {
         hasher.update(val.as_bytes());
         let hex = format!("{:x}", hasher.finalize());
         let res = hex.get(..32).unwrap_or(&hex).to_string();
-        println!("HASHING: {:?} -> {}", val, res);
         res
     }
 
@@ -38,7 +37,7 @@ impl HwidProfile {
         }
     }
 
-    /// Compute similarity score (0 to 7 matches)
+    /// Note: A perfect match score is 6 (machine, cpu, ram, gpu, bios, disk).
     pub fn match_score(&self, other: &Self) -> usize {
         let mut score = 0;
         if self.machine == other.machine {
@@ -65,10 +64,6 @@ impl HwidProfile {
 
 pub fn get_hwid_profile() -> Result<HwidProfile> {
     // 1. Get Machine UUID
-    println!(
-        "IS OBFUSCATION ON? {}",
-        cfg!(feature = "string-obfuscation")
-    );
     let machine = machine_uid::get().unwrap_or_else(|_| crate::rs_str!("unknown_machine"));
 
     // 2. CPU and RAM
@@ -88,7 +83,6 @@ pub fn get_hwid_profile() -> Result<HwidProfile> {
     let ram = format!("{}GB", ram_gb_rounded);
 
     // 3. GPU
-    println!("MACRO GPU: {:?}", crate::rs_str!("unknown_gpu"));
     let gpu = get_gpu_id().unwrap_or_else(|| crate::rs_str!("unknown_gpu"));
 
     // 4. BIOS UUID
@@ -251,7 +245,6 @@ fn get_gpu_id() -> Option<String> {
                 || l.to_lowercase().contains(&crate::rs_str!("3d"))
         })
         .map(|s| s.trim().to_string());
-    println!("GET_GPU_ID: {:?}", res);
     res
 }
 
@@ -284,5 +277,3 @@ fn get_disk_serial() -> Option<String> {
         .find(|l| !l.is_empty())
         .map(|s| s.to_string())
 }
-
-//

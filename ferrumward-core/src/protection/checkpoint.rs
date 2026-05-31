@@ -47,5 +47,3 @@ fn trigger_failure(config: &crate::protection::integrity::ProtectionConfig) -> R
     }
     Err(FerrumWardError::TamperDetected)
 }
-
-//
