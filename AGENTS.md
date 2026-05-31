@@ -70,3 +70,4 @@ if let Some(ref cb) = config.on_failure {
 - `string-obfuscation` — optional (litcrypt)
 - `tpm` — optional, Linux-only (tss-esapi)
 - `full` — all features enabled
+

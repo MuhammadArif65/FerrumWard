@@ -12,3 +12,4 @@ crate-type = ["cdylib"]
 [dependencies]
 rustshield-core = { path = "../rustshield-core", features = ["full"] }
 godot.workspace = true
+

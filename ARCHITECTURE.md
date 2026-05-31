@@ -87,3 +87,4 @@ Here is exactly how a game developer uses RustShield from compiling the game to 
     *   It decrypts the license to ensure the embedded HWID matches the *current* machine's HWID. If the player copied the game to a different PC, the HWIDs won't match, and the game closes.
 5.  **Game Starts:** The game engine initializes.
 6.  **Active Protection:** The Chaotic Hive-Mind threading begins, running the Neural Heuristic Engine in the background 3-20 times per second to ensure no cheating tools are attached during gameplay.
+

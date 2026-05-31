@@ -9,3 +9,4 @@ description = "Bevy Engine plugin for RustShield"
 [dependencies]
 rustshield-core = { path = "../rustshield-core", features = ["full"] }
 bevy.workspace = true
+

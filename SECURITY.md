@@ -42,3 +42,4 @@ The following are in scope for security reports:
 - Attacks requiring physical access to the target machine
 - Social engineering
 - Denial of service against the protected application itself
+

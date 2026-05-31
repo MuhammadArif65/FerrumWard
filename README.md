@@ -167,3 +167,4 @@ If you intend to use RustShield for a real commercial game release, you **must**
 
 ## Security Notice
 RustShield relies on Obscurity + Verification. While it dramatically raises the barrier for reverse engineering and piracy, no offline DRM is 100% unbreakable. It is highly recommended to pair RustShield with proper code obfuscation tools at the binary level.
+

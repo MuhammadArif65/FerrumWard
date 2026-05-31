@@ -11,3 +11,4 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 rustshield-core = { path = "../rustshield-core", features = ["full"] }
+
