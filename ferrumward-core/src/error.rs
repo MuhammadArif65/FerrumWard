@@ -61,6 +61,10 @@ pub enum FerrumWardError {
     #[error("cryptographic operation failed: {0}")]
     CryptoError(String),
 
+    /// Returned when an invalid key is provided.
+    #[error("invalid cryptographic key")]
+    InvalidKey,
+
     /// Returned for general I/O errors.
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),

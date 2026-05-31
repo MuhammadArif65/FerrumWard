@@ -127,27 +127,33 @@ pub fn verify_manifest_signature(
     sig_path: &Path,
     public_key: &[u8],
 ) -> Result<()> {
-    use ed25519_dalek::{Verifier, VerifyingKey, Signature};
+    use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 
     let key_bytes: [u8; 32] = public_key
         .try_into()
         .map_err(|_| FerrumWardError::InvalidKey)?;
-    let verifying_key = VerifyingKey::from_bytes(&key_bytes)
-        .map_err(|_| FerrumWardError::InvalidKey)?;
+    let verifying_key =
+        VerifyingKey::from_bytes(&key_bytes).map_err(|_| FerrumWardError::InvalidKey)?;
 
     let mut sig_file = File::open(sig_path).map_err(|_| FerrumWardError::TamperDetected)?;
     let mut sig_bytes = [0u8; 64];
-    sig_file.read_exact(&mut sig_bytes).map_err(|_| FerrumWardError::TamperDetected)?;
+    sig_file
+        .read_exact(&mut sig_bytes)
+        .map_err(|_| FerrumWardError::TamperDetected)?;
     let signature = Signature::from_bytes(&sig_bytes);
 
-    let mut manifest_file = File::open(manifest_path).map_err(|_| FerrumWardError::ManifestCorrupted)?;
+    let mut manifest_file =
+        File::open(manifest_path).map_err(|_| FerrumWardError::ManifestCorrupted)?;
     let mut manifest_content = Vec::new();
-    manifest_file.read_to_end(&mut manifest_content).map_err(|_| FerrumWardError::ManifestCorrupted)?;
+    manifest_file
+        .read_to_end(&mut manifest_content)
+        .map_err(|_| FerrumWardError::ManifestCorrupted)?;
 
-    verifying_key.verify(&manifest_content, &signature).map_err(|_| FerrumWardError::TamperDetected)?;
+    verifying_key
+        .verify(&manifest_content, &signature)
+        .map_err(|_| FerrumWardError::TamperDetected)?;
 
     Ok(())
 }
-
 
 //

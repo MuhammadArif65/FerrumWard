@@ -34,6 +34,7 @@ fn test_burst_hacking_and_sequential_protect() {
                     manifest_path: None,
                     anti_debug: false,
                     anti_vm: false,
+                    allow_proton: true,
                     on_failure: None,
                 };
                 let _ = protect(config);
@@ -55,6 +56,7 @@ fn test_burst_hacking_and_sequential_protect() {
                 manifest_path: None,
                 anti_debug: false,
                 anti_vm: false,
+                allow_proton: true,
                 on_failure: None,
             };
             let _ = protect(config);

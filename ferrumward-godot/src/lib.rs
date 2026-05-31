@@ -85,6 +85,7 @@ impl FerrumWardGuard {
             manifest_path: manifest_opt,
             anti_debug,
             anti_vm,
+            allow_proton: true,
             on_failure: Some(Box::new(move |_err: FerrumWardError| {
                 // Background thread callback
                 // Note: Emitting signals from threads must be deferred.

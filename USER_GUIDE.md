@@ -70,6 +70,7 @@ fn main() {
         manifest_path: Some("manifest.json".into()),
         anti_debug: true,
         anti_vm: true,
+        allow_proton: true, // Allow Steam Deck
         on_failure: Some(Box::new(|err| {
             // If cheat is detected or license is invalid, exit automatically.
             std::process::exit(1);

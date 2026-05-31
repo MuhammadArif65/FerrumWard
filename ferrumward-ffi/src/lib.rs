@@ -15,6 +15,7 @@ pub struct CProtectionConfig {
     pub manifest_path: *const std::ffi::c_char,
     pub anti_debug: bool,
     pub anti_vm: bool,
+    pub allow_proton: bool,
     pub on_failure: Option<extern "C" fn()>,
 }
 
@@ -82,6 +83,7 @@ pub extern "C" fn ferrumward_init(config: *const CProtectionConfig) -> i32 {
             manifest_path,
             anti_debug: c_config.anti_debug,
             anti_vm: c_config.anti_vm,
+            allow_proton: c_config.allow_proton,
             on_failure: failure_cb.map(|cb| {
                 let wrapped_cb: Box<dyn Fn(FerrumWardError) + Send + Sync> =
                     Box::new(move |_err| {

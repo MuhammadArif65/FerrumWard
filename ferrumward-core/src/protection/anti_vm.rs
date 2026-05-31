@@ -40,14 +40,13 @@ fn contains_vm_signature(info: &str, allow_proton: bool) -> bool {
     let lower = info.to_lowercase();
 
     // Whitelist check first
-    if allow_proton {
-        if lower.contains(crate::rs_str!("wine").as_str())
+    if allow_proton
+        && (lower.contains(crate::rs_str!("wine").as_str())
             || lower.contains(crate::rs_str!("proton").as_str())
             || lower.contains(crate::rs_str!("valve").as_str())
-            || lower.contains(crate::rs_str!("steamdeck").as_str())
-        {
-            return false;
-        }
+            || lower.contains(crate::rs_str!("steamdeck").as_str()))
+    {
+        return false;
     }
 
     // Blacklist check

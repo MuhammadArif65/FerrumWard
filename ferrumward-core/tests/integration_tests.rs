@@ -27,6 +27,7 @@ fn test_full_protection_lifecycle() {
         manifest_path: None,
         anti_debug: false, // Turn off for tests to prevent test runner from failing
         anti_vm: false,
+        allow_proton: true,
         on_failure: Some(Box::new(|_err| {
             // Test mock failure
         })),
