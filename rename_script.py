@@ -50,3 +50,4 @@ for d in dirs:
     git_mv(d, new_d)
 
 print("Renaming completed successfully.")
+

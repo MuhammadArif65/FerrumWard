@@ -49,3 +49,4 @@ fn print_secret() {
 3. **Performance Impact**: Decrypting strings at runtime incurs a tiny overhead. Avoid using obfuscated strings in extremely hot performance loops (like the inner render loop of your game engine).
 
 <!-- -->
+
