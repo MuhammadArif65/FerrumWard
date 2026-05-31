@@ -8,11 +8,15 @@
 
 ## Reporting a Vulnerability
 
+**Why not open a public GitHub Issue?**
+Meskipun proyek ini berifat *Open Source*, RustShield adalah sistem pelindung (*security software*). Jika seseorang menemukan celah keamanan (*Zero-Day Vulnerability*) dan melaporkannya secara publik di tab *Issues*, para *hacker* dan pembajak game bisa langsung membaca dan mengeksploitasi celah tersebut untuk membobol ratusan game sebelum kami sempat merilis pembaruan (*patch*).
+
+Oleh karena itu, kami menerapkan standar industri keamanan global yang disebut **Coordinated Vulnerability Disclosure (CVD)**. Kami meminta Anda untuk melaporkan celah keamanan secara pribadi agar kami bisa memperbaikinya *sebelum* celah tersebut dipublikasikan.
+
 If you discover a security vulnerability in RustShield, **please do NOT open a public GitHub issue**.
+Instead, please report it responsibly via private email:
 
-Instead, please report it responsibly via email:
-
-- **Email:** security@rustshield.dev
+- **Email:** muhamadarif7566@gmail.com
 - **Subject:** `[SECURITY] Brief description of vulnerability`
 
 ### What to include:
